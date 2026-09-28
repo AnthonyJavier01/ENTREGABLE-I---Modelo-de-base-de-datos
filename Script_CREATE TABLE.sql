@@ -1,0 +1,104 @@
+-- Script para crear tablas e indices
+
+/*
+CREATE DATABASE VentasDB;
+GO
+
+USE VentasDB;
+GO
+*/
+
+
+CREATE TABLE Categorias
+(
+CategoriaId INT IDENTITY(1,1) PRIMARY KEY,
+Nombre VARCHAR(100) NOT NULL,
+Descripcion VARCHAR(250),
+Created DATETIME NOT NULL DEFAULT GETDATE(),
+Updated DATETIME NULL,
+Deleted DATETIME NULL
+);
+GO
+
+CREATE TABLE Productos
+(
+ProductoId INT IDENTITY(1,1) PRIMARY KEY,
+Nombre VARCHAR(150) NOT NULL,
+Precio DECIMAL(10,2) NOT NULL,
+Stock INT NOT NULL,
+CategoriaId INT NOT NULL,
+Created DATETIME NOT NULL DEFAULT GETDATE(),
+Updated DATETIME NULL,
+Deleted DATETIME NULL,
+ 
+CONSTRAINT FK_Productos_Categorias
+FOREIGN KEY (CategoriaId)
+REFERENCES Categorias(CategoriaId)
+);
+GO
+
+CREATE TABLE Clientes
+(
+ClienteId INT IDENTITY(1,1) PRIMARY KEY,
+Nombre VARCHAR(100) NOT NULL,
+Apellido VARCHAR(100) NOT NULL,
+DNI CHAR(8) NOT NULL UNIQUE,
+Email VARCHAR(150) UNIQUE,
+Telefono VARCHAR(20),
+Created DATETIME NOT NULL DEFAULT GETDATE(),
+Updated DATETIME NULL,
+Deleted DATETIME NULL
+);
+GO
+
+CREATE TABLE Ordenes
+(
+OrdenId INT IDENTITY(1,1) PRIMARY KEY,
+ClienteId INT NOT NULL,
+FechaOrden DATETIME DEFAULT GETDATE(),
+Total DECIMAL(10,2),
+Created DATETIME NOT NULL DEFAULT GETDATE(),
+Updated DATETIME NULL,
+Deleted DATETIME NULL,
+ 
+CONSTRAINT FK_Ordenes_Clientes
+FOREIGN KEY (ClienteId)
+REFERENCES Clientes(ClienteId)
+);
+GO
+
+CREATE TABLE OrdenDetalle
+(
+DetalleId INT IDENTITY(1,1) PRIMARY KEY,
+OrdenId INT NOT NULL,
+ProductoId INT NOT NULL,
+Cantidad INT NOT NULL,
+PrecioUnitario DECIMAL(10,2) NOT NULL,
+SubTotal DECIMAL(10,2) NOT NULL,
+Created DATETIME NOT NULL DEFAULT GETDATE(),
+Updated DATETIME NULL,
+Deleted DATETIME NULL,
+ 
+CONSTRAINT FK_OrdenDetalle_Ordenes
+FOREIGN KEY (OrdenId)
+REFERENCES Ordenes(OrdenId),
+ 
+CONSTRAINT FK_OrdenDetalle_Productos
+FOREIGN KEY (ProductoId)
+REFERENCES Productos(ProductoId)
+);
+GO
+
+
+CREATE INDEX IX_Productos_CategoriaId
+ON Productos(CategoriaId);
+ 
+CREATE INDEX IX_Ordenes_ClienteId
+ON Ordenes(ClienteId);
+ 
+CREATE INDEX IX_OrdenDetalle_OrdenId
+ON OrdenDetalle(OrdenId);
+ 
+CREATE INDEX IX_OrdenDetalle_ProductoId
+ON OrdenDetalle(ProductoId);
+GO
